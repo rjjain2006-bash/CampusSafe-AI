@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampusSafe AI - Clinical Triage Suite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-canvas: #0b2218;
+            --bg-card: #133324;
+            --border-clean: rgba(255, 255, 255, 0.12);
+            --color-green: #059669;
+            --color-green-hover: #047857;
+            --color-yellow: #d97706;
+            --color-yellow-hover: #b45309;
+            --text-main: #f0fdf4;
+            --text-muted: #9ca3af;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-canvas);
+            color: var(--text-main);
+            max-width: 750px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .header-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            padding: 0 4px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand h1 {
+            font-size: 1.6rem;
+            margin: 0;
+            color: #ffffff;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.75rem;
+            background: rgba(5, 150, 105, 0.2);
+            color: #34d399;
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(5, 150, 105, 0.4);
+            font-weight: 600;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: #34d399;
+            border-radius: 50%;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-clean);
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #a7f3d0;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .chip-container {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+
+        .chip {
+            background-color: rgba(255, 255, 255, 0.07);
+            border: 1px solid var(--border-clean);
+            color: #e2e8f0;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .chip:hover {
+            background-color: rgba(217, 119, 6, 0.25);
+            border-color: var(--color-yellow);
+            color: #fde68a;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 16px;
+            background-color: #0b2218;
+            border: 1px solid var(--border-clean);
+            border-radius: 12px;
+            color: #fff;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 0.95rem;
+            min-height: 120px;
+            resize: vertical;
+            transition: border-color 0.2s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #34d399;
+        }
+
+        .mic-btn {
+            position: absolute;
+            right: 14px;
+            bottom: 14px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-clean);
+            color: #d1fae5;
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background-color 0.2s;
+        }
+
+        .mic-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .mic-btn.listening {
+            background-color: rgba(217, 119, 6, 0.3);
+            color: #fde68a;
+            border-color: var(--color-yellow);
+        }
+
+        .file-upload-box {
+            background-color: #0b2218;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            padding: 18px 20px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .file-upload-box:hover {
+            border-color: #34d399;
+        }
+
+        .grid-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        @media(max-width: 600px) {
+            .grid-row { grid-template-columns: 1fr; }
+        }
+
+        select {
+            width: 100%;
+            padding: 14px;
+            background-color: #0b2218;
+            border: 1px solid var(--border-clean);
+            border-radius: 12px;
+            color: #fff;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #34d399;
+        }
+
+        button.action-btn {
+            background-color: var(--color-green);
+            color: white;
+            border: none;
+            padding: 16px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+            letter-spacing: 0.3px;
+            transition: background-color 0.2s;
+        }
+
+        button.action-btn:hover {
+            background-color: var(--color-green-hover);
+        }
+
+        .btn-hospital {
+            background-color: var(--color-yellow);
+        }
+
+        .btn-hospital:hover {
+            background-color: var(--color-yellow-hover);
+        }
+
+        #response {
+            margin-top: 24px;
+            background-color: #0b2218;
+            border: 1px solid rgba(5, 150, 105, 0.4);
+            padding: 20px;
+            border-radius: 12px;
+            display: none;
+            white-space: pre-line;
+            line-height: 1.6;
+            color: #a7f3d0;
+            font-size: 0.95rem;
+        }
+
+        #response.error {
+            background-color: #3f1515;
+            border-color: #dc2626;
+            color: #fca5a5;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-banner">
+        <div class="brand">
+            <span style="font-size: 1.8rem;">🛡️</span>
+            <h1>CampusSafe AI</h1>
+        </div>
+        <div class="status-badge">
+            <div class="pulse-dot"></div>
+            Clinical Engine Active
+        </div>
+    </div>
+
+    <div class="card">
+        <label for="prompt">Describe your situation or symptoms:</label>
+        
+        <div class="chip-container">
+            <span class="chip" onclick="appendSymptom('Severe chemical burn on hand from lab')">🔥 Lab Burn</span>
+            <span class="chip" onclick="appendSymptom('Deep cut bleeding heavily from glass shard')">🩸 Bleeding Cut</span>
+            <span class="chip" onclick="appendSymptom('Severe difficulty breathing and wheezing')">🫁 Breathing Issue</span>
+            <span class="chip" onclick="appendSymptom('Sudden dizziness, fainting, and weakness')">💫 Fainting</span>
+            <span class="chip" onclick="appendSymptom('Severe ankle sprain / suspected fracture after fall')">🦴 Fracture / Fall</span>
+        </div>
+
+        <div class="input-group">
+            <textarea id="prompt" placeholder="Type or click the mic to dictate your situation..."></textarea>
+            <button type="button" id="micBtn" class="mic-btn" onclick="toggleSpeechRecognition()">🎤 Speak</button>
+        </div>
+        
+        <label>Diagnostic Visual Evidence (Optional):</label>
+        <div class="file-upload-box" onclick="document.getElementById('image').click()">
+            <span style="font-size: 1.5rem;">📷</span>
+            <div style="text-align: left;">
+                <div style="font-weight: 600; color: #fff;" id="fileLabelText">Click here to upload image / photo</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Supports PNG, JPG, JPEG files</div>
+            </div>
+            <input type="file" id="image" accept="image/*" style="display: none;" onchange="updateFileName(this)">
+        </div>
+
+        <div class="grid-row">
+            <div>
+                <label for="language">Response Language:</label>
+                <select id="language">
+                    <option value="English">English</option>
+                    <option value="Hindi">Hindi</option>
+                </select>
+            </div>
+            <div style="display: flex; align-items: flex-end;">
+                <button id="submit" class="action-btn" style="margin: 0;">Execute Analysis</button>
+            </div>
+        </div>
+
+        <div id="response"></div>
+    </div>
+
+    <!-- Google Maps Nearest Hospital Widget -->
+    <div class="card" style="text-align: center;">
+        <h3 style="margin-top: 0; color: #fde68a; font-size: 1.1rem; margin-bottom: 8px;">📍 Emergency Facility Navigator</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Instantly pinpoint medical facilities around your location.</p>
+        <button class="action-btn btn-hospital" onclick="findNearestHospital()">Find Hospital</button>
+    </div>
+
+    <script>
+        function appendSymptom(text) {
+            const promptBox = document.getElementById('prompt');
+            promptBox.value = promptBox.value ? promptBox.value + '. ' + text : text;
+        }
+
+        function updateFileName(input) {
+            const labelText = document.getElementById('fileLabelText');
+            if (input.files && input.files[0]) {
+                labelText.textContent = 'Selected: ' + input.files[0].name;
+                labelText.style.color = '#34d399';
+            } else {
+                labelText.textContent = 'Click here to upload image / photo';
+                labelText.style.color = '#fff';
+            }
+        }
+
+        let recognition = null;
+        function toggleSpeechRecognition() {
+            const micBtn = document.getElementById('micBtn');
+            const promptBox = document.getElementById('prompt');
+
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                alert('Speech recognition is not supported in this browser. Please use Chrome or Edge.');
+                return;
+            }
+
+            if (!recognition) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    promptBox.value = promptBox.value ? promptBox.value + ' ' + transcript : transcript;
+                };
+
+                recognition.onerror = () => {
+                    micBtn.textContent = '🎤 Speak';
+                    micBtn.classList.remove('listening');
+                };
+
+                recognition.onend = () => {
+                    micBtn.textContent = '🎤 Speak';
+                    micBtn.classList.remove('listening');
+                };
+            }
+
+            if (micBtn.classList.contains('listening')) {
+                recognition.stop();
+                micBtn.textContent = '🎤 Speak';
+                micBtn.classList.remove('listening');
+            } else {
+                try {
+                    recognition.start();
+                    micBtn.textContent = '🛑 Stop Mic';
+                    micBtn.classList.add('listening');
+                } catch (err) {
+                    recognition.stop();
+                    micBtn.textContent = '🎤 Speak';
+                    micBtn.classList.remove('listening');
+                }
+            }
+        }
+
+        function findNearestHospital() {
+            window.open('https://www.google.com/maps/search/hospitals+near+me', '_blank');
+        }
+
+        document.getElementById('submit').addEventListener('click', async () => {
+            const prompt = document.getElementById('prompt').value;
+            const language = document.getElementById('language').value;
+            const fileInput = document.getElementById('image').files[0];
+            const respDiv = document.getElementById('response');
+
+            if (!prompt && !fileInput) {
+                alert('Please enter a description or upload an image.');
+                return;
+            }
+
+            respDiv.className = '';
+            respDiv.style.display = 'block';
+            respDiv.textContent = 'Analyzing your situation...';
+
+            let imageBase64 = null;
+            if (fileInput) {
+                imageBase64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(fileInput);
+                });
+            }
+
+            try {
+                const res = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt, language, imageBase64 })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    respDiv.className = '';
+                    respDiv.textContent = data.result;
+                } else {
+                    respDiv.className = 'error';
+                    respDiv.textContent = 'Error: ' + data.error;
+                }
+            } catch (err) {
+                respDiv.className = 'error';
+                respDiv.textContent = 'Connection error: Ensure app.py is running.';
+            }
+        });
+    </script>
+</body>
+</html>
