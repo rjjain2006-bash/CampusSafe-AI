@@ -67,6 +67,5 @@ def analyze():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 if __name__ == '__main__':
-    print("Server running on http://localhost:3000 - Opening browser automatically...")
-    Timer(1, lambda: webbrowser.open("http://localhost:3000")).start()
-    app.run(host='127.0.0.1', port=3000, debug=False)
+    port = int(os.environ.get('PORT', 8080))
+    app.run(host='0.0.0.0', port=port)
